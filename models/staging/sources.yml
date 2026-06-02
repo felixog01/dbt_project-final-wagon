@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: electricity
+    database: project-final-wagon
+    schema: electricity
+    tables:
+      - name: autonomie_energetique
+      - name: consommation_commune
+      - name: consommation_commune_multi_annees
+      - name: production_enr_commune
+      - name: pvgis_all_communes
+
+  - name: infrastructure
+    database: project-final-wagon
+    schema: infrastructure
+    tables:
+      - name: installations_enr
+      - name: postes_rte
+      - name: postes_rte_dept
+      - name: reseau_commune
+      - name: tarifs_rachat_enr
+
+  - name: territoire
+    database: project-final-wagon
+    schema: territoire
+    tables:
+      - name: occupation_sols
+      - name: relief
+      - name: zones_protegees
+
+  - name: data_meteo
+    database: project-final-wagon
+    schema: data_meteo
+    tables:
+      - name: meteo_agregee_commune
+      - name: meteo_france_communes
+      - name: meteo_rendement_commune
