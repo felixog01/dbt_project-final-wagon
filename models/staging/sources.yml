@@ -27,6 +27,7 @@ sources:
     tables:
       - name: occupation_sols
       - name: relief
+      - name: relief_commune
       - name: zones_protegees
 
   - name: data_meteo
