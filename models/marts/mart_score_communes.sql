@@ -78,7 +78,7 @@ normalized as (
             )
         ))                                                      as n_surf_eol,
 
-        -- Raccordement — plus strict
+        -- Raccordement
         case f.score_raccordement
             when 'Très favorable' then 0.70
             when 'Favorable'      then 0.50
@@ -87,7 +87,7 @@ normalized as (
             else 0.30
         end                                                     as n_raccordement,
 
-        -- Zones protégées — plus strict
+        -- Zones protégées
         case
             when f.pct_territoire_protege >= 75 then 0.0
             when f.pct_territoire_protege >= 50 then 0.15
@@ -97,7 +97,7 @@ normalized as (
             else 1.0
         end                                                     as n_zones_inv,
 
-        -- Fiabilité vent — plus stricte
+        -- Fiabilité vent
         case f.fiabilite_vent
             when 'Très fiable'       then 0.80
             when 'Fiable'            then 0.55
@@ -148,15 +148,17 @@ final as (
         score_eolien,
         greatest(score_solaire, score_eolien)                   as score_global,
 
+        -- Recommandation
         case
-            when score_solaire >= 60 and score_eolien >= 60 then 'Solaire + Éolien'
+            when score_solaire >= 50 and score_eolien >= 50 then 'Solaire + Éolien'
             when score_solaire >= score_eolien              then 'Solaire'
             else                                                 'Éolien'
         end                                                     as technologie_recommandee,
 
+        -- Classe
         case
-            when greatest(score_solaire, score_eolien) >= 70 then 'Top potentiel'
-            when greatest(score_solaire, score_eolien) >= 50 then 'Bon potentiel'
+            when greatest(score_solaire, score_eolien) >= 60 then 'Top potentiel'
+            when greatest(score_solaire, score_eolien) >= 45 then 'Bon potentiel'
             when greatest(score_solaire, score_eolien) >= 30 then 'Potentiel modéré'
             else                                                  'Faible potentiel'
         end                                                     as classe_score,
