@@ -25,9 +25,9 @@ sources:
     database: project-final-wagon
     schema: territoire
     tables:
-      - name: occupation_sols
+      - name: occupation_sols_commune
       - name: relief_commune
-      - name: zones_protegees
+      - name: zones_protegees_commune
 
   - name: data_meteo
     database: project-final-wagon
