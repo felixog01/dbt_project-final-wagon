@@ -96,13 +96,13 @@ normalized as (
         )                                                       as n_zones_inv,
 
         -- Fiabilité vent : score discret
-        case f.fiabilite_vent
-            when 'Très fiable'          then 1.0
-            when 'Fiable'               then 0.75
-            when 'Modérément fiable'    then 0.45
-            when 'Variable'             then 0.20
-            else 0.10
-        end                                                     as n_fiabilite_vent
+        case score_raccordement
+            when 'Très favorable' then 1.0
+            when 'Favorable'      then 0.75
+            when 'Modéré'         then 0.40
+            when 'Difficile'      then 0.10
+            else 0.5
+        end                                                    as n_fiabilite_vent
 
     from features f
     cross join stats s
