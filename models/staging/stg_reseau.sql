@@ -15,4 +15,4 @@ renamed as (
 
 select * from renamed
 -- Exclure les DOM
-where code_departement not in ('971', '972', '973', '974', '976')
+where code_departement not in ('971', '972', '973', '974', '975', '976', '977','978','984', '986','987','988', '989')
