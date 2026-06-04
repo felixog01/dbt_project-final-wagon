@@ -53,6 +53,9 @@ select
     score_raccordement,
     classe_pente_dominante,
     exposition_dominante,
+    has_natura2000,
+    has_znieff,
+    has_parc_national,
     has_pnr,
     has_reserve_naturelle,
 

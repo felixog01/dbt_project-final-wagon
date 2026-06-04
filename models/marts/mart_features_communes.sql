@@ -39,6 +39,9 @@ select
     coalesce(t.exposition_dominante, 'Inconnu')                                 as exposition_dominante,
     coalesce(t.favorable_solaire, false)                                         as favorable_solaire,
     coalesce(t.favorable_eolien, false)                                          as favorable_eolien,
+    coalesce(t.has_natura2000, false)                                            as has_natura2000,
+    coalesce(t.has_znieff, false)                                               as has_znieff,
+    coalesce(t.has_parc_national, false)                                         as has_parc_national,
     coalesce(t.has_pnr, false)                                                  as has_pnr,
     coalesce(t.has_reserve_naturelle, false)                                     as has_reserve_naturelle,
     -- ── ENERGIE ───────────────────────────────────────────────
