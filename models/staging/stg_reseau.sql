@@ -4,11 +4,11 @@ with source as (
 
 renamed as (
     select
-        cast(code_commune as string)        as code_insee,
+        LPAD(cast(code_commune as string), 5, '0')          as code_insee,
         nom_commune,
         code_departement,
-        cast(nb_postes_rte as int64)        as nb_postes_rte,
-        cast(nb_postes_htb as int64)        as nb_postes_htb,
+        cast(nb_postes_rte as int64)                        as nb_postes_rte,
+        cast(nb_postes_htb as int64)                        as nb_postes_htb,
         score_raccordement
     from source
 )
