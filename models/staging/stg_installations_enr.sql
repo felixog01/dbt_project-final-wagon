@@ -4,7 +4,7 @@ with source as (
 
 renamed as (
     select
-        cast(codeinseecommune as string)                    as code_insee,
+        LPAD(cast(codeinseecommune as string), 5, '0')      as code_insee,
         commune,
         departement,
         codedepartement                                     as code_departement,
