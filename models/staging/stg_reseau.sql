@@ -14,3 +14,5 @@ renamed as (
 )
 
 select * from renamed
+-- Exclure les DOM
+where code_departement not in ('971', '972', '973', '974', '976')
