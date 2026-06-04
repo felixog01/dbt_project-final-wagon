@@ -36,6 +36,8 @@ select
     coalesce(z.has_natura2000, false)            as has_natura2000,
     coalesce(z.has_znieff, false)               as has_znieff,
     coalesce(z.has_parc_national, false)         as has_parc_national,
+    coalesce(z.has_pnr, false)                  as has_pnr,
+    coalesce(z.has_reserve_naturelle, false)     as has_reserve_naturelle,
     coalesce(z.pct_territoire_protege, 0)        as pct_territoire_protege,
 
     -- Relief

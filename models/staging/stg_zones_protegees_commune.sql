@@ -10,6 +10,8 @@ renamed as (
         cast(has_natura2000 as bool)                        as has_natura2000,
         cast(has_znieff as bool)                            as has_znieff,
         cast(has_parc_national as bool)                     as has_parc_national,
+        cast(has_pnr as bool)                               as has_pnr,
+        cast(has_reserve_naturelle as bool)                 as has_reserve_naturelle,
         cast(pct_territoire_protege as float64)             as pct_territoire_protege
     from source
 )

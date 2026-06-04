@@ -53,6 +53,8 @@ select
     score_raccordement,
     classe_pente_dominante,
     exposition_dominante,
+    has_pnr,
+    has_reserve_naturelle,
 
     -- ── ÉNERGIE ───────────────────────────────────────────────
     nb_habitants,
