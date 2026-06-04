@@ -39,7 +39,8 @@ select
     coalesce(t.exposition_dominante, 'Inconnu')                                 as exposition_dominante,
     coalesce(t.favorable_solaire, false)                                         as favorable_solaire,
     coalesce(t.favorable_eolien, false)                                          as favorable_eolien,
-
+    coalesce(t.has_pnr, false)                                                  as has_pnr,
+    coalesce(t.has_reserve_naturelle, false)                                     as has_reserve_naturelle,
     -- ── ENERGIE ───────────────────────────────────────────────
     coalesce(e.nb_habitants, 0)                                                 as nb_habitants,
     coalesce(e.conso_moy_periode_mwh, 0)                                        as conso_moy_periode_mwh,
