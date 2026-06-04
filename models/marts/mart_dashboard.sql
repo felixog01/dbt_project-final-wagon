@@ -96,3 +96,4 @@ select
     , 0)                                             as production_potentielle_eol_gwh
 
 from scores
+where code_departement not in ('97','98')
