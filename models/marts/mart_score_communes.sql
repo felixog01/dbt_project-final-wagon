@@ -187,6 +187,8 @@ final as (
         fiabilite_vent,
         classe_pente_dominante,
         exposition_dominante,
+        has_pnr,
+        has_reserve_naturelle,
 
         round(n_pvgis * 100, 1)             as score_composante_pvgis,
         round(n_irrad * 100, 1)             as score_composante_irradiation,
