@@ -51,6 +51,8 @@ select
     altitude_moy_m,
     pct_territoire_protege,
     score_raccordement,
+    classe_pente_dominante,
+    exposition_dominante,
 
     -- ── ÉNERGIE ───────────────────────────────────────────────
     nb_habitants,
