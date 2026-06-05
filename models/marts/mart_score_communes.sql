@@ -148,6 +148,10 @@ final as (
         score_eolien,
         greatest(score_solaire, score_eolien)                   as score_global,
 
+        -- Éligibilité par technologie
+        score_solaire >= 50                                     as eligible_solaire,
+        score_eolien  >= 50                                     as eligible_eolien,
+
         -- Recommandation
         case
             when score_solaire >= 50 and score_eolien >= 50 then 'Solaire + Éolien'
@@ -185,8 +189,6 @@ final as (
         viable_solaire,
         viable_eolien,
         fiabilite_vent,
-        classe_pente_dominante,
-        exposition_dominante,
         has_natura2000,
         has_znieff,
         has_parc_national,

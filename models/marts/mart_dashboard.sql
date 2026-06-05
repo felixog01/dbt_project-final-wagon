@@ -16,8 +16,10 @@ select
     score_global,
     technologie_recommandee,
     classe_score,
+    eligible_solaire,
+    eligible_eolien,
 
-    -- Composantes scores (pour explicabilité dashboard)
+    -- Composantes scores
     score_composante_pvgis,
     score_composante_irradiation,
     score_composante_surface_sol,
@@ -51,13 +53,13 @@ select
     altitude_moy_m,
     pct_territoire_protege,
     score_raccordement,
-    classe_pente_dominante,
-    exposition_dominante,
     has_natura2000,
     has_znieff,
     has_parc_national,
     has_pnr,
     has_reserve_naturelle,
+    classe_pente_dominante,
+    exposition_dominante,
 
     -- ── ÉNERGIE ───────────────────────────────────────────────
     nb_habitants,
@@ -67,30 +69,16 @@ select
     statut_enr,
 
     -- ── RENTABILITÉ ESTIMÉE ───────────────────────────────────
-    -- Solaire : 1 MWc installé → production_kwh_kwc_an MWh/an
-    -- Tarif moyen rachat solaire sol : 55 €/MWh
     round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
-
-    -- Éolien : 1 éolienne 2MW → productible_eolien_mwh_an MWh/an
-    -- Tarif moyen rachat éolien : 72 €/MWh
     round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
 
     -- ── POTENTIEL ESTIMÉ ──────────────────────────────────────
-    -- Surface installable solaire (10% de surface_solaire_ha)
     round(surface_solaire_ha * 0.10, 1)             as surface_installable_sol_ha,
-
-    -- Puissance installable solaire (1 MWc / ha)
     round(surface_solaire_ha * 0.10 * 1, 1)         as puissance_installable_sol_mwc,
-
-    -- Production potentielle solaire
     round(
         surface_solaire_ha * 0.10 * production_kwh_kwc_an / 1000
     , 0)                                             as production_potentielle_sol_gwh,
-
-    -- Nombre d'éoliennes installables (1 éolienne / 50 ha)
     cast(surface_eolien_ha / 50 as int64)           as nb_eoliennes_installables,
-
-    -- Production potentielle éolienne
     round(
         (surface_eolien_ha / 50) * productible_eolien_mwh_an / 1000
     , 0)                                             as production_potentielle_eol_gwh
