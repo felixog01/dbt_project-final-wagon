@@ -25,26 +25,6 @@ select
     max(case when annee = '2023' then energie_eolien_mwh else 0 end)    as prod_eol_2023_mwh,
     max(case when annee = '2024' then energie_eolien_mwh else 0 end)    as prod_eol_2024_mwh,
 
-    -- ── HYDRAULIQUE PAR ANNÉE ─────────────────────────────────
-    max(case when annee = '2017' then energie_hydraulique_mwh else 0 end) as prod_hydro_2017_mwh,
-    max(case when annee = '2018' then energie_hydraulique_mwh else 0 end) as prod_hydro_2018_mwh,
-    max(case when annee = '2019' then energie_hydraulique_mwh else 0 end) as prod_hydro_2019_mwh,
-    max(case when annee = '2020' then energie_hydraulique_mwh else 0 end) as prod_hydro_2020_mwh,
-    max(case when annee = '2021' then energie_hydraulique_mwh else 0 end) as prod_hydro_2021_mwh,
-    max(case when annee = '2022' then energie_hydraulique_mwh else 0 end) as prod_hydro_2022_mwh,
-    max(case when annee = '2023' then energie_hydraulique_mwh else 0 end) as prod_hydro_2023_mwh,
-    max(case when annee = '2024' then energie_hydraulique_mwh else 0 end) as prod_hydro_2024_mwh,
-
-    -- ── BIO-ÉNERGIE PAR ANNÉE ─────────────────────────────────
-    max(case when annee = '2017' then energie_bio_mwh else 0 end)       as prod_bio_2017_mwh,
-    max(case when annee = '2018' then energie_bio_mwh else 0 end)       as prod_bio_2018_mwh,
-    max(case when annee = '2019' then energie_bio_mwh else 0 end)       as prod_bio_2019_mwh,
-    max(case when annee = '2020' then energie_bio_mwh else 0 end)       as prod_bio_2020_mwh,
-    max(case when annee = '2021' then energie_bio_mwh else 0 end)       as prod_bio_2021_mwh,
-    max(case when annee = '2022' then energie_bio_mwh else 0 end)       as prod_bio_2022_mwh,
-    max(case when annee = '2023' then energie_bio_mwh else 0 end)       as prod_bio_2023_mwh,
-    max(case when annee = '2024' then energie_bio_mwh else 0 end)       as prod_bio_2024_mwh,
-
     -- ── TOTAL PAR ANNÉE ───────────────────────────────────────
     max(case when annee = '2017' then energie_totale_mwh else 0 end)    as prod_tot_2017_mwh,
     max(case when annee = '2018' then energie_totale_mwh else 0 end)    as prod_tot_2018_mwh,
