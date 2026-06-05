@@ -124,3 +124,4 @@ select
 
 from scores
 where code_departement not in ('97','98')
+
