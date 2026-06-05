@@ -75,10 +75,6 @@ select
     prod_sol_2021_mwh, prod_sol_2022_mwh, prod_sol_2023_mwh, prod_sol_2024_mwh,
     prod_eol_2017_mwh, prod_eol_2018_mwh, prod_eol_2019_mwh, prod_eol_2020_mwh,
     prod_eol_2021_mwh, prod_eol_2022_mwh, prod_eol_2023_mwh, prod_eol_2024_mwh,
-    prod_hydro_2017_mwh, prod_hydro_2018_mwh, prod_hydro_2019_mwh, prod_hydro_2020_mwh,
-    prod_hydro_2021_mwh, prod_hydro_2022_mwh, prod_hydro_2023_mwh, prod_hydro_2024_mwh,
-    prod_bio_2017_mwh, prod_bio_2018_mwh, prod_bio_2019_mwh, prod_bio_2020_mwh,
-    prod_bio_2021_mwh, prod_bio_2022_mwh, prod_bio_2023_mwh, prod_bio_2024_mwh,
     prod_tot_2017_mwh, prod_tot_2018_mwh, prod_tot_2019_mwh, prod_tot_2020_mwh,
     prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
 
