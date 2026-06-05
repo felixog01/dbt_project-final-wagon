@@ -183,16 +183,16 @@ final as (
         prix_terrain_p75_eur_ha,
 
         -- Scores composantes
-        round(n_pvgis * 100, 1)             as score_composante_pvgis,
-        round(n_irrad * 100, 1)             as score_composante_irradiation,
-        round(n_surf_sol * 100, 1)          as score_composante_surface_sol,
-        round(n_pente_inv * 100, 1)         as score_composante_pente,
-        round(n_vent * 100, 1)              as score_composante_vent,
-        round(n_productible * 100, 1)       as score_composante_productible,
-        round(n_surf_eol * 100, 1)          as score_composante_surface_eol,
-        round(n_zones_inv * 100, 1)         as score_composante_zones,
-        round(n_raccordement * 100, 1)      as score_composante_raccordement,
-        round(n_fiabilite_vent * 100, 1)    as score_composante_fiabilite_vent
+        round(coalesce(n_pvgis, 0) * 100, 1)             as score_composante_pvgis,
+        round(coalesce(n_irrad, 0) * 100, 1)             as score_composante_irradiation,
+        round(coalesce(n_surf_sol, 0) * 100, 1)          as score_composante_surface_sol,
+        round(coalesce(n_pente_inv, 0) * 100, 1)         as score_composante_pente,
+        round(coalesce(n_vent, 0) * 100, 1)              as score_composante_vent,
+        round(coalesce(n_productible, 0) * 100, 1)       as score_composante_productible,
+        round(coalesce(n_surf_eol, 0) * 100, 1)          as score_composante_surface_eol,
+        round(coalesce(n_zones_inv, 0) * 100, 1)         as score_composante_zones,
+        round(coalesce(n_raccordement, 0) * 100, 1)      as score_composante_raccordement,
+        round(coalesce(n_fiabilite_vent, 0) * 100, 1)    as score_composante_fiabilite_vent
 
     from scored
 )

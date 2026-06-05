@@ -78,16 +78,17 @@ select
     prod_tot_2017_mwh, prod_tot_2018_mwh, prod_tot_2019_mwh, prod_tot_2020_mwh,
     prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
 
-    -- ── POTENTIEL ESTIMÉ ──────────────────────────────────────
-    round(surface_solaire_ha * 0.10, 1)             as surface_installable_sol_ha,
-    round(surface_solaire_ha * 0.10 * 1, 1)         as puissance_installable_sol_mwc,
+    -- ── POTENTIEL ESTIMÉ (surfaces capées à un projet réaliste) ──
+    -- Cap : 200 ha solaire (≈ très grande centrale) | 20 éoliennes max par commune
+    round(least(surface_solaire_ha * 0.10, 200), 1)         as surface_installable_sol_ha,
+    round(least(surface_solaire_ha * 0.10, 200), 1)         as puissance_installable_sol_mwc,
     round(
-        surface_solaire_ha * 0.10 * production_kwh_kwc_an / 1000
-    , 0)                                             as production_potentielle_sol_gwh,
-    cast(surface_eolien_ha / 50 as int64)           as nb_eoliennes_installables,
+        least(surface_solaire_ha * 0.10, 200) * production_kwh_kwc_an / 1000
+    , 0)                                                     as production_potentielle_sol_gwh,
+    cast(least(surface_eolien_ha / 50, 20) as int64)        as nb_eoliennes_installables,
     round(
-        (surface_eolien_ha / 50) * productible_eolien_mwh_an / 1000
-    , 0)                                             as production_potentielle_eol_gwh,
+        least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000
+    , 0)                                                     as production_potentielle_eol_gwh,
 
     -- ── RENTABILITÉ ───────────────────────────────────────────
     round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
@@ -98,34 +99,27 @@ select
     prix_terrain_p25_eur_ha,
     prix_terrain_p75_eur_ha,
 
-    round(surface_solaire_ha * 0.10 * 1 * 1000 * 1050, 0)          as cout_install_sol_eur,
+    round(least(surface_solaire_ha * 0.10, 200) * 1000 * 1050, 0)   as cout_install_sol_eur,
+    round(least(surface_eolien_ha / 50, 20) * 2 * 1400000, 0)       as cout_install_eol_eur,
+    round(least(surface_solaire_ha * 0.10, 200) * prix_terrain_median_eur_ha, 0) as cout_foncier_sol_eur,
+    round(least(surface_eolien_ha, 1000) * 0.02 * prix_terrain_median_eur_ha, 0) as cout_foncier_eol_eur,
     round(
-        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000, 0
-    )                                                               as cout_install_eol_eur,
-    round(
-        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha, 0
-    )                                                               as cout_foncier_sol_eur,
-    round(
-        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha, 0
-    )                                                               as cout_foncier_eol_eur,
-    round(
-        surface_solaire_ha * 0.10 * 1 * 1000 * 1050 +
-        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha, 0
+        least(surface_solaire_ha * 0.10, 200) * 1000 * 1050 +
+        least(surface_solaire_ha * 0.10, 200) * prix_terrain_median_eur_ha, 0
     )                                                               as cout_total_sol_eur,
     round(
-        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000 +
-        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha, 0
+        least(surface_eolien_ha / 50, 20) * 2 * 1400000 +
+        least(surface_eolien_ha, 1000) * 0.02 * prix_terrain_median_eur_ha, 0
     )                                                               as cout_total_eol_eur,
     round(safe_divide(
-        surface_solaire_ha * 0.10 * 1 * 1000 * 1050 +
-        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha,
-        production_kwh_kwc_an * 55 * surface_solaire_ha * 0.10
+        least(surface_solaire_ha * 0.10, 200) * 1000 * 1050 +
+        least(surface_solaire_ha * 0.10, 200) * prix_terrain_median_eur_ha,
+        production_kwh_kwc_an * 55 * least(surface_solaire_ha * 0.10, 200)
     ), 1)                                                           as roi_sol_ans,
     round(safe_divide(
-        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000 +
-        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha,
-        productible_eolien_mwh_an * 72 *
-        cast(surface_eolien_ha / 50 as int64)
+        least(surface_eolien_ha / 50, 20) * 2 * 1400000 +
+        least(surface_eolien_ha, 1000) * 0.02 * prix_terrain_median_eur_ha,
+        productible_eolien_mwh_an * 72 * least(surface_eolien_ha / 50, 20)
     ), 1)                                                           as roi_eol_ans
 
 from scores
