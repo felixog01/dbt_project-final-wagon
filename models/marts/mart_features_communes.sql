@@ -48,8 +48,8 @@ select
         WHEN '19' THEN '19 - Corrèze'
         WHEN '2A' THEN '2A - Corse-du-Sud'
         WHEN '2B' THEN '2B - Haute-Corse'
-        WHEN '21' THEN '21 - Côte-d''Or'
-        WHEN '22' THEN '22 - Côtes-d''Armor'
+        WHEN '21' THEN "21 - Côte-d'Or"
+        WHEN '22' THEN "22 - Côtes-d'Armor"
         WHEN '23' THEN '23 - Creuse'
         WHEN '24' THEN '24 - Dordogne'
         WHEN '25' THEN '25 - Doubs'
@@ -122,7 +122,7 @@ select
         WHEN '92' THEN '92 - Hauts-de-Seine'
         WHEN '93' THEN '93 - Seine-Saint-Denis'
         WHEN '94' THEN '94 - Val-de-Marne'
-        WHEN '95' THEN '95 - Val-d\''Oise'
+        WHEN '95' THEN "95 - Val-d'Oise"
         ELSE coalesce(t.code_departement,
             LEFT(coalesce(e.code_insee, t.code_insee, m.code_insee), 2))
     end                                                             as nom_departement,
