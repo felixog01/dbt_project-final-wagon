@@ -10,6 +10,8 @@ sources:
       - name: consommation_commune_multi_annees
       - name: production_enr_commune
       - name: pvgis_all_communes
+      - name: production_enr_commune_annuelle
+      - name : production_enr_dept_annuelle
 
   - name: infrastructure
     database: project-final-wagon
@@ -28,6 +30,7 @@ sources:
       - name: occupation_sols_commune
       - name: relief_commune
       - name: zones_protegees_commune
+      - name: prix_terrain_agricole_dept
 
   - name: data_meteo
     database: project-final-wagon

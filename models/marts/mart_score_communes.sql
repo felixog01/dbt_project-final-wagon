@@ -22,63 +22,34 @@ normalized as (
     select
         f.*,
 
-        -- PVGIS normalisé P5-P95
         least(1.0, greatest(0.0,
-            safe_divide(
-                f.production_kwh_kwc_an - s.p05_pvgis,
-                s.p95_pvgis - s.p05_pvgis
-            )
+            safe_divide(f.production_kwh_kwc_an - s.p05_pvgis, s.p95_pvgis - s.p05_pvgis)
         ))                                                      as n_pvgis,
 
-        -- Irradiation normalisée P5-P95
         least(1.0, greatest(0.0,
-            safe_divide(
-                f.irradiation_kwh_m2_an - s.p05_irrad,
-                s.p95_irrad - s.p05_irrad
-            )
+            safe_divide(f.irradiation_kwh_m2_an - s.p05_irrad, s.p95_irrad - s.p05_irrad)
         ))                                                      as n_irrad,
 
-        -- Surface solaire (log)
         least(1.0, greatest(0.0,
-            safe_divide(
-                ln(f.surface_solaire_ha + 1),
-                ln(10000)
-            )
+            safe_divide(ln(f.surface_solaire_ha + 1), ln(10000))
         ))                                                      as n_surf_sol,
 
-        -- Pente inversée P5-P95
         least(1.0, greatest(0.0,
-            1 - safe_divide(
-                f.pente_moy_deg - s.p05_pente,
-                s.p95_pente - s.p05_pente
-            )
+            1 - safe_divide(f.pente_moy_deg - s.p05_pente, s.p95_pente - s.p05_pente)
         ))                                                      as n_pente_inv,
 
-        -- Vent normalisé P5-P95
         least(1.0, greatest(0.0,
-            safe_divide(
-                f.wind_speed_moy_ms - s.p05_vent,
-                s.p95_vent - s.p05_vent
-            )
+            safe_divide(f.wind_speed_moy_ms - s.p05_vent, s.p95_vent - s.p05_vent)
         ))                                                      as n_vent,
 
-        -- Productible éolien normalisé P25-P75
         least(1.0, greatest(0.0,
-            safe_divide(
-                f.productible_eolien_mwh_an - s.p25_productible,
-                s.p75_productible - s.p25_productible
-            )
+            safe_divide(f.productible_eolien_mwh_an - s.p25_productible, s.p75_productible - s.p25_productible)
         ))                                                      as n_productible,
 
-        -- Surface éolien (log)
         least(1.0, greatest(0.0,
-            safe_divide(
-                ln(f.surface_eolien_ha + 1),
-                ln(50000)
-            )
+            safe_divide(ln(f.surface_eolien_ha + 1), ln(50000))
         ))                                                      as n_surf_eol,
 
-        -- Raccordement
         case f.score_raccordement
             when 'Très favorable' then 0.70
             when 'Favorable'      then 0.50
@@ -87,7 +58,6 @@ normalized as (
             else 0.30
         end                                                     as n_raccordement,
 
-        -- Zones protégées
         case
             when f.pct_territoire_protege >= 75 then 0.0
             when f.pct_territoire_protege >= 50 then 0.15
@@ -97,7 +67,6 @@ normalized as (
             else 1.0
         end                                                     as n_zones_inv,
 
-        -- Fiabilité vent
         case f.fiabilite_vent
             when 'Très fiable'       then 0.80
             when 'Fiable'            then 0.55
@@ -113,8 +82,6 @@ normalized as (
 scored as (
     select
         *,
-
-        -- Score Solaire (0-100)
         round((
             0.35 * coalesce(n_pvgis,       0) +
             0.30 * coalesce(n_irrad,        0) +
@@ -124,7 +91,6 @@ scored as (
             0.05 * coalesce(n_raccordement, 0)
         ) * 100, 1)                                             as score_solaire,
 
-        -- Score Éolien (0-100)
         round((
             0.40 * coalesce(n_vent,             0) +
             0.25 * coalesce(n_productible,      0) +
@@ -144,31 +110,38 @@ final as (
         latitude,
         longitude,
         code_departement,
+        nom_departement,
         score_solaire,
         score_eolien,
-        greatest(score_solaire, score_eolien)                   as score_global,
 
-        -- Éligibilité par technologie
         score_solaire >= 50                                     as eligible_solaire,
         score_eolien  >= 50                                     as eligible_eolien,
 
-        -- Recommandation
         case
-            when score_solaire >= 50 and score_eolien >= 50 then 'Solaire + Éolien'
-            when score_solaire >= score_eolien              then 'Solaire'
-            else                                                 'Éolien'
-        end                                                     as technologie_recommandee,
+            when score_solaire >= score_eolien then 'Solaire'
+            else                                    'Éolien'
+        end                                                     as technologie_dominante,
 
-        -- Classe
         case
-            when greatest(score_solaire, score_eolien) >= 60 then 'Top potentiel'
-            when greatest(score_solaire, score_eolien) >= 45 then 'Bon potentiel'
-            when greatest(score_solaire, score_eolien) >= 30 then 'Potentiel modéré'
-            else                                                  'Faible potentiel'
-        end                                                     as classe_score,
+            when score_solaire >= 60 then 'Top potentiel solaire'
+            when score_solaire >= 45 then 'Bon potentiel solaire'
+            when score_solaire >= 30 then 'Potentiel modéré solaire'
+            else                          'Faible potentiel solaire'
+        end                                                     as classe_solaire,
 
+        case
+            when score_eolien >= 60 then 'Top potentiel éolien'
+            when score_eolien >= 45 then 'Bon potentiel éolien'
+            when score_eolien >= 30 then 'Potentiel modéré éolien'
+            else                         'Faible potentiel éolien'
+        end                                                     as classe_eolien,
+
+        -- Features clés
         nb_habitants,
         conso_moy_periode_mwh,
+        conso_2017_mwh, conso_2018_mwh, conso_2019_mwh, conso_2020_mwh,
+        conso_2021_mwh, conso_2022_mwh, conso_2023_mwh, conso_2024_mwh,
+        evolution_conso_pct,
         production_kwh_kwc_an,
         irradiation_kwh_m2_an,
         wind_speed_moy_ms,
@@ -178,25 +151,42 @@ final as (
         pct_territoire_protege,
         pente_moy_deg,
         altitude_moy_m,
+        classe_pente_dominante,
+        exposition_dominante,
         score_raccordement,
         taux_autonomie_pct,
         statut_enr,
         statut_autonomie,
         puissance_totale_mw,
         energie_totale_mwh_an,
-        classe_solaire,
-        classe_vent,
         viable_solaire,
         viable_eolien,
         fiabilite_vent,
+        classe_vent,
         has_natura2000,
         has_znieff,
         has_parc_national,
         has_pnr,
         has_reserve_naturelle,
-        classe_pente_dominante,
-        exposition_dominante,
 
+        -- Production par année
+        prod_sol_2017_mwh, prod_sol_2018_mwh, prod_sol_2019_mwh, prod_sol_2020_mwh,
+        prod_sol_2021_mwh, prod_sol_2022_mwh, prod_sol_2023_mwh, prod_sol_2024_mwh,
+        prod_eol_2017_mwh, prod_eol_2018_mwh, prod_eol_2019_mwh, prod_eol_2020_mwh,
+        prod_eol_2021_mwh, prod_eol_2022_mwh, prod_eol_2023_mwh, prod_eol_2024_mwh,
+        prod_hydro_2017_mwh, prod_hydro_2018_mwh, prod_hydro_2019_mwh, prod_hydro_2020_mwh,
+        prod_hydro_2021_mwh, prod_hydro_2022_mwh, prod_hydro_2023_mwh, prod_hydro_2024_mwh,
+        prod_bio_2017_mwh, prod_bio_2018_mwh, prod_bio_2019_mwh, prod_bio_2020_mwh,
+        prod_bio_2021_mwh, prod_bio_2022_mwh, prod_bio_2023_mwh, prod_bio_2024_mwh,
+        prod_tot_2017_mwh, prod_tot_2018_mwh, prod_tot_2019_mwh, prod_tot_2020_mwh,
+        prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
+
+        -- Prix terrain
+        prix_terrain_median_eur_ha,
+        prix_terrain_p25_eur_ha,
+        prix_terrain_p75_eur_ha,
+
+        -- Scores composantes
         round(n_pvgis * 100, 1)             as score_composante_pvgis,
         round(n_irrad * 100, 1)             as score_composante_irradiation,
         round(n_surf_sol * 100, 1)          as score_composante_surface_sol,
