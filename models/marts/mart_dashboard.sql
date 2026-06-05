@@ -9,17 +9,17 @@ select
     latitude,
     longitude,
     code_departement,
+    nom_departement,
 
     -- ── SCORES ────────────────────────────────────────────────
     score_solaire,
     score_eolien,
-    score_global,
-    technologie_recommandee,
-    classe_score,
     eligible_solaire,
     eligible_eolien,
+    technologie_dominante,
+    classe_solaire,
+    classe_eolien,
 
-    -- Composantes scores
     score_composante_pvgis,
     score_composante_irradiation,
     score_composante_surface_sol,
@@ -34,7 +34,6 @@ select
     -- ── SOLAIRE ───────────────────────────────────────────────
     production_kwh_kwc_an,
     irradiation_kwh_m2_an,
-    classe_solaire,
     viable_solaire,
     surface_solaire_ha,
     puissance_totale_mw                             as puissance_solaire_installee_mw,
@@ -51,6 +50,8 @@ select
     -- ── TERRITOIRE ────────────────────────────────────────────
     pente_moy_deg,
     altitude_moy_m,
+    classe_pente_dominante,
+    exposition_dominante,
     pct_territoire_protege,
     score_raccordement,
     has_natura2000,
@@ -58,19 +59,24 @@ select
     has_parc_national,
     has_pnr,
     has_reserve_naturelle,
-    classe_pente_dominante,
-    exposition_dominante,
 
     -- ── ÉNERGIE ───────────────────────────────────────────────
     nb_habitants,
     conso_moy_periode_mwh,
+    conso_2017_mwh, conso_2018_mwh, conso_2019_mwh, conso_2020_mwh,
+    conso_2021_mwh, conso_2022_mwh, conso_2023_mwh, conso_2024_mwh,
+    evolution_conso_pct,
     taux_autonomie_pct,
     statut_autonomie,
     statut_enr,
 
-    -- ── RENTABILITÉ ESTIMÉE ───────────────────────────────────
-    round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
-    round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
+    -- ── PRODUCTION PAR ANNÉE ──────────────────────────────────
+    prod_sol_2017_mwh, prod_sol_2018_mwh, prod_sol_2019_mwh, prod_sol_2020_mwh,
+    prod_sol_2021_mwh, prod_sol_2022_mwh, prod_sol_2023_mwh, prod_sol_2024_mwh,
+    prod_eol_2017_mwh, prod_eol_2018_mwh, prod_eol_2019_mwh, prod_eol_2020_mwh,
+    prod_eol_2021_mwh, prod_eol_2022_mwh, prod_eol_2023_mwh, prod_eol_2024_mwh,
+    prod_tot_2017_mwh, prod_tot_2018_mwh, prod_tot_2019_mwh, prod_tot_2020_mwh,
+    prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
 
     -- ── POTENTIEL ESTIMÉ ──────────────────────────────────────
     round(surface_solaire_ha * 0.10, 1)             as surface_installable_sol_ha,
@@ -81,7 +87,46 @@ select
     cast(surface_eolien_ha / 50 as int64)           as nb_eoliennes_installables,
     round(
         (surface_eolien_ha / 50) * productible_eolien_mwh_an / 1000
-    , 0)                                             as production_potentielle_eol_gwh
+    , 0)                                             as production_potentielle_eol_gwh,
+
+    -- ── RENTABILITÉ ───────────────────────────────────────────
+    round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
+    round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
+
+    -- ── PRIX TERRAIN & FINANCIER ──────────────────────────────
+    prix_terrain_median_eur_ha,
+    prix_terrain_p25_eur_ha,
+    prix_terrain_p75_eur_ha,
+
+    round(surface_solaire_ha * 0.10 * 1 * 1000 * 1050, 0)          as cout_install_sol_eur,
+    round(
+        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000, 0
+    )                                                               as cout_install_eol_eur,
+    round(
+        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha, 0
+    )                                                               as cout_foncier_sol_eur,
+    round(
+        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha, 0
+    )                                                               as cout_foncier_eol_eur,
+    round(
+        surface_solaire_ha * 0.10 * 1 * 1000 * 1050 +
+        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha, 0
+    )                                                               as cout_total_sol_eur,
+    round(
+        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000 +
+        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha, 0
+    )                                                               as cout_total_eol_eur,
+    round(safe_divide(
+        surface_solaire_ha * 0.10 * 1 * 1000 * 1050 +
+        surface_solaire_ha * 0.10 * prix_terrain_median_eur_ha,
+        production_kwh_kwc_an * 55 * surface_solaire_ha * 0.10
+    ), 1)                                                           as roi_sol_ans,
+    round(safe_divide(
+        cast(surface_eolien_ha / 50 as int64) * 2 * 1400000 +
+        surface_eolien_ha * 0.02 * prix_terrain_median_eur_ha,
+        productible_eolien_mwh_an * 72 *
+        cast(surface_eolien_ha / 50 as int64)
+    ), 1)                                                           as roi_eol_ans
 
 from scores
 where code_departement not in ('97','98')
