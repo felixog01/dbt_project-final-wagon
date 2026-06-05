@@ -7,30 +7,29 @@ meteo as (
 meteo_agregee as (
     select * from {{ ref('stg_meteo_agregee') }}
 )
-
 select
-    -- Corriger les anciens codes INSEE vers les nouveaux
     CASE m.code_insee
-        WHEN '12076' THEN '12218'  -- Conques-en-Rouergue
-        WHEN '49069' THEN '49126'  -- Orée d'Anjou
-        WHEN '28349' THEN '76601'  -- Saint-Lucien
-        WHEN '33401' THEN '85212'  -- Sainte-Florence
+        WHEN '12076' THEN '12218'
+        WHEN '49069' THEN '49126'
+        WHEN '28349' THEN '76601'
+        WHEN '33401' THEN '85212'
         ELSE m.code_insee
-    END                                                             as code_insee,
+    END                                                         as code_insee,
     m.commune,
     m.latitude,
     m.longitude,
 
-    -- Données issues de stg_pvgis (Rendement PV réel)
-    coalesce(p.production_kwh_kwc_an, m.productible_eolien_mwh_an) as production_kwh_kwc_an,
-    coalesce(p.irradiation_kwh_m2_an, m.irradiation_kwh_m2_an)     as irradiation_kwh_m2_an,
-    coalesce(p.performance_ratio_pct, m.performance_ratio_pct)      as performance_ratio_pct,
+    -- Production solaire : PVGIS uniquement, PAS de fallback éolien
+    -- Si PVGIS null, estimer depuis irradiation (ratio ~0.78)
+    coalesce(
+        p.production_kwh_kwc_an,
+        round(coalesce(p.irradiation_kwh_m2_an, m.irradiation_kwh_m2_an) * 0.78, 1)
+    )                                                           as production_kwh_kwc_an,
+    coalesce(p.irradiation_kwh_m2_an, m.irradiation_kwh_m2_an)  as irradiation_kwh_m2_an,
+    coalesce(p.performance_ratio_pct, m.performance_ratio_pct)  as performance_ratio_pct,
 
-    -- Solaire
     m.classe_solaire,
     m.viable_solaire,
-
-    -- Météo globale
     m.radiation_moy_wh_m2_jour,
     m.radiation_total_wh_m2,
     m.sunshine_moy_h_jour,
@@ -38,7 +37,6 @@ select
     m.rain_moy_mm_jour,
     m.nb_jours,
 
-    -- Éolien
     m.wind_speed_moy_ms,
     m.wind_speed_max_ms,
     m.wind_p50,
@@ -50,10 +48,7 @@ select
     m.viable_eolien,
     m.fiabilite_vent,
 
-    -- Tendance annuelle
     ma.tendance_radiation_wh_m2_par_an,
-
-    -- Par année
     ma.radiation_2017_wh_m2,
     ma.radiation_2018_wh_m2,
     ma.radiation_2019_wh_m2,
@@ -65,9 +60,7 @@ select
     ma.radiation_2025_wh_m2
 
 from meteo as m
-left join pvgis as p         on m.code_insee = p.code_insee
+left join pvgis as p          on m.code_insee = p.code_insee
 left join meteo_agregee as ma on m.code_insee = ma.code_insee
-
--- Exclure les communes sans données essentielles
 where m.production_kwh_kwc_an is not null
 and   m.wind_speed_moy_ms     is not null
