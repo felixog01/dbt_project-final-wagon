@@ -194,6 +194,8 @@ final as (
         has_parc_national,
         has_pnr,
         has_reserve_naturelle,
+        classe_pente_dominante,
+        exposition_dominante,
 
         round(n_pvgis * 100, 1)             as score_composante_pvgis,
         round(n_irrad * 100, 1)             as score_composante_irradiation,
