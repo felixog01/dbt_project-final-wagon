@@ -21,3 +21,4 @@ renamed as (
 )
 
 select * from renamed
+qualify row_number() over (partition by code_insee order by code_insee) = 1
