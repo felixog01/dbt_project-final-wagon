@@ -253,3 +253,4 @@ left join prix_terrain pt        on coalesce(t.code_departement,
 where coalesce(t.code_departement,
     LEFT(coalesce(e.code_insee, t.code_insee, m.code_insee), 2))
     not in ('971', '972', '973', '974', '976')
+    
