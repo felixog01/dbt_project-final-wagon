@@ -30,6 +30,10 @@ select
     score_composante_zones,
     score_composante_raccordement,
     score_composante_fiabilite_vent,
+    score_composante_exposition,
+    score_composante_nuages,
+    score_composante_relief_eol,
+    score_composante_rafale,
 
     -- ── SOLAIRE ───────────────────────────────────────────────
     production_kwh_kwc_an,
