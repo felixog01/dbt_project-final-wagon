@@ -36,7 +36,7 @@ select
     irradiation_kwh_m2_an,
     viable_solaire,
     surface_solaire_ha,
-    puissance_totale_mw                             as puissance_solaire_installee_mw,
+    puissance_solaire_mw                            as puissance_solaire_installee_mw,
     energie_totale_mwh_an                           as energie_solaire_produite_mwh,
 
     -- ── ÉOLIEN ────────────────────────────────────────────────
@@ -46,6 +46,7 @@ select
     viable_eolien,
     fiabilite_vent,
     surface_eolien_ha,
+    puissance_eolien_mw                             as puissance_eolien_installee_mw,
 
     -- ── TERRITOIRE ────────────────────────────────────────────
     pente_moy_deg,
@@ -79,7 +80,6 @@ select
     prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
 
     -- ── POTENTIEL ESTIMÉ (surfaces capées à un projet réaliste) ──
-    -- Cap : 200 ha solaire (≈ très grande centrale) | 20 éoliennes max par commune
     round(least(surface_solaire_ha * 0.10, 200), 1)         as surface_installable_sol_ha,
     round(least(surface_solaire_ha * 0.10, 200), 1)         as puissance_installable_sol_mwc,
     round(
@@ -89,6 +89,39 @@ select
     round(
         least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000
     , 0)                                                     as production_potentielle_eol_gwh,
+
+    -- ── SATURATION & DISPONIBILITÉ (par technologie) ──────────
+    round(safe_divide(
+        puissance_solaire_mw,
+        puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)
+    ) * 100, 1)                                     as taux_saturation_sol_pct,
+    round(100 - safe_divide(
+        puissance_solaire_mw,
+        puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)
+    ) * 100, 1)                                     as disponibilite_sol_pct,
+    case
+        when safe_divide(puissance_solaire_mw,
+             puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 75 then 'Saturé'
+        when safe_divide(puissance_solaire_mw,
+             puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 25 then 'Partiellement exploité'
+        else 'Disponible'
+    end                                             as classe_disponibilite_sol,
+
+    round(safe_divide(
+        puissance_eolien_mw,
+        puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2
+    ) * 100, 1)                                     as taux_saturation_eol_pct,
+    round(100 - safe_divide(
+        puissance_eolien_mw,
+        puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2
+    ) * 100, 1)                                     as disponibilite_eol_pct,
+    case
+        when safe_divide(puissance_eolien_mw,
+             puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 75 then 'Saturé'
+        when safe_divide(puissance_eolien_mw,
+             puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 25 then 'Partiellement exploité'
+        else 'Disponible'
+    end                                             as classe_disponibilite_eol,
 
     -- ── RENTABILITÉ ───────────────────────────────────────────
     round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
