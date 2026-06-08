@@ -157,8 +157,6 @@ final as (
         taux_autonomie_pct,
         statut_enr,
         statut_autonomie,
-        puissance_totale_mw,
-        energie_totale_mwh_an,
         viable_solaire,
         viable_eolien,
         fiabilite_vent,
@@ -168,6 +166,10 @@ final as (
         has_parc_national,
         has_pnr,
         has_reserve_naturelle,
+        puissance_totale_mw,
+        puissance_solaire_mw,
+        puissance_eolien_mw,
+        energie_totale_mwh_an,
 
         -- Production par année
         prod_sol_2017_mwh, prod_sol_2018_mwh, prod_sol_2019_mwh, prod_sol_2020_mwh,
