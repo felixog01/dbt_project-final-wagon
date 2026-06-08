@@ -30,6 +30,10 @@ select
     score_composante_zones,
     score_composante_raccordement,
     score_composante_fiabilite_vent,
+    score_composante_exposition,
+    score_composante_nuages,
+    score_composante_relief_eol,
+    score_composante_rafale,
 
     -- ── SOLAIRE ───────────────────────────────────────────────
     production_kwh_kwc_an,
@@ -122,7 +126,17 @@ select
              puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 25 then 'Partiellement exploité'
         else 'Disponible'
     end                                             as classe_disponibilite_eol,
+-- ── SCORE AJUSTÉ PAR DISPONIBILITÉ ────────────────────────
+    -- Potentiel réellement exploitable = score × part de place restante
+    round(score_solaire * safe_divide(
+        100 - safe_divide(puissance_solaire_mw,
+            puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100, 100
+    ), 1)                                           as score_solaire_ajuste,
 
+    round(score_eolien * safe_divide(
+        100 - safe_divide(puissance_eolien_mw,
+            puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100, 100
+    ), 1)                                           as score_eolien_ajuste,
     -- ── RENTABILITÉ ───────────────────────────────────────────
     round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
     round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
