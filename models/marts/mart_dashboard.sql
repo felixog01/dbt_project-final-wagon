@@ -94,7 +94,17 @@ select
         least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000
     , 0)                                                     as production_potentielle_eol_gwh,
 
-    -- ── SATURATION & DISPONIBILITÉ ────────────────────────────
+-- ── POTENTIEL RÉALISTE (contraintes acceptabilité/réseau/foncier) ──
+    -- Solaire : 5% du théorique mobilisable (calibré PPE3)
+    round(
+        least(surface_solaire_ha * 0.10, 200) * production_kwh_kwc_an / 1000 * 0.05
+    , 1)                                                     as production_realiste_sol_gwh,
+    -- Éolien : 8% du théorique mobilisable
+    round(
+        least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000 * 0.08
+    , 1)                                                     as production_realiste_eol_gwh,
+
+   -- ── SATURATION & DISPONIBILITÉ ────────────────────────────
     round(safe_divide(
         puissance_solaire_mw,
         puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)
