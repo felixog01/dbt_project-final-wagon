@@ -164,7 +164,7 @@ final as (
         score_eolien,
 
         score_solaire >= 50                                     as eligible_solaire,
-        score_eolien  >= 50                                     as eligible_eolien,
+        score_eolien  >= 60                                     as eligible_eolien,
 
         case
             when score_solaire >= score_eolien then 'Solaire'
