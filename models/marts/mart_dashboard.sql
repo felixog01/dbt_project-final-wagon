@@ -152,8 +152,8 @@ select
     ), 1), 1)                                       as score_eolien_ajuste,
 
     -- ── RENTABILITÉ ───────────────────────────────────────────
-    round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
-    round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
+    round(production_kwh_kwc_an * 88, 0)            as revenu_solaire_eur_par_mwc_an,
+    round(productible_eolien_mwh_an * 80, 0)        as revenu_eolien_eur_par_machine_an,
 
     -- ── PRIX TERRAIN & FINANCIER ──────────────────────────────
     prix_terrain_median_eur_ha,
@@ -175,12 +175,12 @@ select
     round(safe_divide(
         least(surface_solaire_ha * 0.10, 200) * 1000 * 1050 +
         least(surface_solaire_ha * 0.10, 200) * prix_terrain_median_eur_ha,
-        production_kwh_kwc_an * 55 * least(surface_solaire_ha * 0.10, 200)
+        production_kwh_kwc_an * 88 * least(surface_solaire_ha * 0.10, 200)
     ), 1)                                                           as roi_sol_ans,
     round(safe_divide(
         least(surface_eolien_ha / 50, 20) * 2 * 1400000 +
         least(surface_eolien_ha, 1000) * 0.02 * prix_terrain_median_eur_ha,
-        productible_eolien_mwh_an * 72 * least(surface_eolien_ha / 50, 20)
+        productible_eolien_mwh_an * 80 * least(surface_eolien_ha / 50, 20)
     ), 1)                                                           as roi_eol_ans
 
 from scores
