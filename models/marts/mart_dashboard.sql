@@ -85,7 +85,7 @@ select
     prod_tot_2017_mwh, prod_tot_2018_mwh, prod_tot_2019_mwh, prod_tot_2020_mwh,
     prod_tot_2021_mwh, prod_tot_2022_mwh, prod_tot_2023_mwh, prod_tot_2024_mwh,
 
-    -- ── POTENTIEL ESTIMÉ ──────────────────────────────────────
+    -- ── POTENTIEL ESTIMÉ (surfaces capées à un projet réaliste) ──
     round(least(surface_solaire_ha * 0.10, 200), 1)         as surface_installable_sol_ha,
     round(least(surface_solaire_ha * 0.10, 200), 1)         as puissance_installable_sol_mwc,
     round(
@@ -96,60 +96,61 @@ select
         least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000
     , 0)                                                     as production_potentielle_eol_gwh,
 
--- ── POTENTIEL RÉALISTE (contraintes acceptabilité/réseau/foncier) ──
-    -- Solaire : 5% du théorique mobilisable (calibré PPE3)
+    -- ── POTENTIEL RÉALISTE (contraintes acceptabilité/réseau/foncier) ──
     round(
         least(surface_solaire_ha * 0.10, 200) * production_kwh_kwc_an / 1000 * 0.05
     , 1)                                                     as production_realiste_sol_gwh,
-    -- Éolien : 8% du théorique mobilisable
     round(
         least(surface_eolien_ha / 50, 20) * productible_eolien_mwh_an / 1000 * 0.08
     , 1)                                                     as production_realiste_eol_gwh,
 
-   -- ── SATURATION & DISPONIBILITÉ (NULL nettoyés) ────────────
-    -- Saturation : si pas de calcul possible (pas de surface) = 0% saturé
+    -- ── SATURATION & DISPONIBILITÉ SOLAIRE (NULL nettoyés) ────
+    -- Saturation : si pas de surface installable = 0% saturé
     coalesce(round(safe_divide(
-        puissance_solaire_installee_mw,
-        puissance_solaire_installee_mw + least(surface_solaire_ha * 0.10, 200)
+        puissance_solaire_mw,
+        puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)
     ) * 100, 1), 0)                                 as taux_saturation_sol_pct,
-    -- Disponibilité : si pas de calcul possible = 100% disponible
+    -- Disponibilité : si pas de surface installable = 100% disponible
     coalesce(round(100 - safe_divide(
-        puissance_solaire_installee_mw,
-        puissance_solaire_installee_mw + least(surface_solaire_ha * 0.10, 200)
+        puissance_solaire_mw,
+        puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)
     ) * 100, 1), 100)                               as disponibilite_sol_pct,
     case
-        when safe_divide(puissance_solaire_installee_mw,
-             puissance_solaire_installee_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 75 then 'Saturé'
-        when safe_divide(puissance_solaire_installee_mw,
-             puissance_solaire_installee_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 25 then 'Partiellement exploité'
+        when safe_divide(puissance_solaire_mw,
+             puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 75 then 'Saturé'
+        when safe_divide(puissance_solaire_mw,
+             puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100 >= 25 then 'Partiellement exploité'
         else 'Disponible'
     end                                             as classe_disponibilite_sol,
 
+    -- ── SATURATION & DISPONIBILITÉ ÉOLIEN (NULL nettoyés) ─────
     coalesce(round(safe_divide(
-        puissance_eolien_installee_mw,
-        puissance_eolien_installee_mw + least(surface_eolien_ha / 50, 20) * 2
+        puissance_eolien_mw,
+        puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2
     ) * 100, 1), 0)                                 as taux_saturation_eol_pct,
     coalesce(round(100 - safe_divide(
-        puissance_eolien_installee_mw,
-        puissance_eolien_installee_mw + least(surface_eolien_ha / 50, 20) * 2
+        puissance_eolien_mw,
+        puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2
     ) * 100, 1), 100)                               as disponibilite_eol_pct,
     case
-        when safe_divide(puissance_eolien_installee_mw,
-             puissance_eolien_installee_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 75 then 'Saturé'
-        when safe_divide(puissance_eolien_installee_mw,
-             puissance_eolien_installee_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 25 then 'Partiellement exploité'
+        when safe_divide(puissance_eolien_mw,
+             puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 75 then 'Saturé'
+        when safe_divide(puissance_eolien_mw,
+             puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100 >= 25 then 'Partiellement exploité'
         else 'Disponible'
     end                                             as classe_disponibilite_eol,
--- ── SCORE AJUSTÉ (dispo jamais NULL → ajusté toujours calculé) ──
-    round(score_solaire * coalesce(safe_divide(
-        100 - safe_divide(puissance_solaire_installee_mw,
-            puissance_solaire_installee_mw + least(surface_solaire_ha * 0.10, 200)) * 100, 100
-    ), 1), 1)                                       as score_solaire_ajuste,
 
+    -- ── SCORE AJUSTÉ PAR DISPONIBILITÉ ────────────────────────
+    -- Si pas de surface : multiplicateur = 1 → score ajusté = score pur
+    round(score_solaire * coalesce(safe_divide(
+        100 - safe_divide(puissance_solaire_mw,
+            puissance_solaire_mw + least(surface_solaire_ha * 0.10, 200)) * 100, 100
+    ), 1), 1)                                       as score_solaire_ajuste,
     round(score_eolien * coalesce(safe_divide(
-        100 - safe_divide(puissance_eolien_installee_mw,
-            puissance_eolien_installee_mw + least(surface_eolien_ha / 50, 20) * 2) * 100, 100
+        100 - safe_divide(puissance_eolien_mw,
+            puissance_eolien_mw + least(surface_eolien_ha / 50, 20) * 2) * 100, 100
     ), 1), 1)                                       as score_eolien_ajuste,
+
     -- ── RENTABILITÉ ───────────────────────────────────────────
     round(production_kwh_kwc_an * 55, 0)            as revenu_solaire_eur_par_mwc_an,
     round(productible_eolien_mwh_an * 72, 0)        as revenu_eolien_eur_par_machine_an,
@@ -184,4 +185,3 @@ select
 
 from scores
 where wind_speed_moy_ms is not null
-
