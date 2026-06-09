@@ -221,6 +221,8 @@ final as (
         has_parc_national,
         has_pnr,
         has_reserve_naturelle,
+        nb_installations_eol,
+        nb_installations_pv,
 
         -- Production par année
         prod_sol_2017_mwh, prod_sol_2018_mwh, prod_sol_2019_mwh, prod_sol_2020_mwh,
