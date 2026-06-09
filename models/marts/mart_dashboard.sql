@@ -40,6 +40,7 @@ select
     irradiation_kwh_m2_an,
     viable_solaire,
     surface_solaire_ha,
+    nb_installations_pv,
     puissance_solaire_mw                            as puissance_solaire_installee_mw,
     energie_totale_mwh_an                           as energie_solaire_produite_mwh,
 
@@ -50,6 +51,7 @@ select
     viable_eolien,
     fiabilite_vent,
     surface_eolien_ha,
+    nb_installations_eol,
     puissance_eolien_mw                             as puissance_eolien_installee_mw,
 
     -- ── TERRITOIRE ────────────────────────────────────────────
