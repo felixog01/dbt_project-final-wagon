@@ -182,5 +182,5 @@ select
     ), 1)                                                           as roi_eol_ans
 
 from scores
-where code_departement not in ('97','98')
+where wind_speed_moy_ms is not null
 
