@@ -172,17 +172,15 @@ final as (
         end                                                     as technologie_dominante,
 
         case
-            when score_solaire >= 60 then 'Top potentiel solaire'
-            when score_solaire >= 45 then 'Bon potentiel solaire'
-            when score_solaire >= 30 then 'Potentiel modéré solaire'
-            else                          'Faible potentiel solaire'
-        end                                                     as classe_solaire,
+            when score_solaire >= 70 then 'Top potentiel'
+            when score_solaire >= 50 then 'Bon potentiel'
+            else 'Non éligible'
+        end                                                    as classe_solaire,
 
         case
-            when score_eolien >= 60 then 'Top potentiel éolien'
-            when score_eolien >= 45 then 'Bon potentiel éolien'
-            when score_eolien >= 30 then 'Potentiel modéré éolien'
-            else                         'Faible potentiel éolien'
+            when score_eolien >= 75 then 'Top potentiel'
+            when score_eolien >= 60 then 'Bon potentiel'
+            else 'Non éligible'
         end                                                     as classe_eolien,
 
         -- Features clés
