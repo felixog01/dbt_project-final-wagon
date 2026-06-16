@@ -183,6 +183,16 @@ final as (
             else 'Non éligible'
         end                                                     as classe_eolien,
 
+        -- Classe d'ensoleillement (équivalent solaire de classe_vent)
+        -- Seuils calés sur les quartiles de l'irradiation française
+        case
+            when irradiation_kwh_m2_an >= 1582 then '☀️ Ensoleillement exceptionnel'
+            when irradiation_kwh_m2_an >= 1472 then '🌤️ Bon ensoleillement'
+            when irradiation_kwh_m2_an >= 1395 then '⛅ Ensoleillement modéré'
+            else '☁️ Faible ensoleillement'
+        end                                                     as classe_ensoleillement,
+
+
         -- Features clés
         nb_habitants,
         conso_moy_periode_mwh,
