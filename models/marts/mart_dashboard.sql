@@ -19,6 +19,7 @@ select
     technologie_dominante,
     classe_solaire,
     classe_eolien,
+    classe_ensoleillement,
 
     score_composante_pvgis,
     score_composante_irradiation,
