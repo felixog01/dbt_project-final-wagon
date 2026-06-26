@@ -131,7 +131,7 @@ SmartRenew Analytics répond à ce besoin en agrégeant des données publiques p
 ## 📁 Structure du repository
 
 ```
-smartrenew-analytics/
+dbt_project-final-wagon/
 ├── models/
 │   ├── staging/              # nettoyage des sources
 │   ├── intermediate/         # construction des features
