@@ -88,25 +88,25 @@ SmartRenew Analytics répond à ce besoin en agrégeant des données publiques p
         (météo · PVGIS · relief · foncier · RTE · installations ENR)
                                   │
                                   ▼
-        ┌──────────────────────────────────────────────────┐
-        │                  dbt + BigQuery (EU)              │
-        │                                                   │
-        │   Staging  ──>  Intermediate  ──>     Marts       │
+        ┌────────────────────────────────────────────────────┐
+        │                  dbt + BigQuery (EU)               │
+        │                                                    │
+        │   Staging  ──>  Intermediate  ──>     Marts        │
         │  (nettoyage)    (features)      (score & dashboard)│
-        └──────────────────────────────────────────────────┘
+        └────────────────────────────────────────────────────┘
                                   │
-                  ┌───────────────┴───────────────┐
+                  ┌───────────────┴────────────────┐
                   ▼                                ▼
-       ┌────────────────────┐          ┌────────────────────┐
-       │  Machine Learning   │          │   Vues de service   │
-       │  (Python/sklearn)   │ ───────> │   (mart_*_ml, etc.) │
-       │  clustering +       │          │                     │
-       │  régression         │          └────────────────────┘
-       └────────────────────┘                     │
+       ┌────────────────────┐          ┌─────────────────────┐
+       │  Machine Learning  │          │   Vues de service   │
+       │  (Python/sklearn)  │ ───────> │   (mart_*_ml, etc.) │
+       │  clustering +      │          │                     │
+       │  régression        │          └─────────────────────┘
+       └────────────────────┘                      │
                                                    ▼
                                        ┌────────────────────┐
-                                       │    Looker Studio    │
-                                       │  Dashboard + outil  │
+                                       │    Looker Studio   │
+                                       │  Dashboard + outil │
                                        └────────────────────┘
 ```
 
@@ -315,12 +315,12 @@ Projette la production de chaque commune à horizon **2030 / 2035 / 2040** à pa
 Construit en **Looker Studio**, organisé en logique « entonnoir » :
 
 ```
-Toutes énergies → Renouvelables → Solaire → Éolien → Outil
+Toutes énergies → Renouvelables → Éolien → Solaire → Outil
 ```
 
 1. **Contexte** — problématique, mix électrique français 2024, place et montée des ENR.
-2. **Analyse solaire** — scoring, classements Top/Flop, focus départemental et communal.
-3. **Analyse éolienne** — idem.
+2. **Analyse éolienne** — scoring, classements Top/Flop, focus départemental et communal.
+3. **Analyse solaire** — idem.
 4. **Outil SmartRenew** — simulateur de projet interactif, profils ML, fiches techniques par commune (avec navigation et filtres propagés entre pages).
 
 ### Aperçu visuel
