@@ -1,0 +1,30 @@
+{{ config(materialized='view') }}
+
+SELECT
+    COUNT(*) as nb_communes,
+    SUM(nb_habitants) as population_totale,
+    ROUND(AVG(score_solaire), 1) as score_solaire_moy,
+    ROUND(AVG(score_eolien), 1) as score_eolien_moy,
+    ROUND(AVG(score_solaire_ajuste), 1) as score_solaire_ajuste_moy,
+    ROUND(AVG(score_eolien_ajuste), 1) as score_eolien_ajuste_moy,
+    COUNTIF(eligible_solaire) as nb_eligibles_solaire,
+    COUNTIF(eligible_eolien) as nb_eligibles_eolien,
+    SUM(nb_installations_pv) as nb_installations_pv,
+    SUM(nb_installations_eol) as nb_installations_eol,
+    ROUND(SUM(puissance_solaire_installee_mw), 0) as puissance_solaire_installee_mw,
+    ROUND(SUM(puissance_eolien_installee_mw), 0) as puissance_eolien_installee_mw,
+    ROUND(SUM(prod_sol_2024_mwh) / 1e6, 1) as prod_solaire_twh,
+    ROUND(SUM(prod_eol_2024_mwh) / 1e6, 1) as prod_eolien_twh,
+    ROUND(SUM(prod_tot_2024_mwh) / 1e6, 1) as prod_totale_twh,
+    ROUND(SUM(conso_2024_mwh) / 1e6, 1) as conso_twh,
+    ROUND(SUM(production_potentielle_sol_gwh) / 1000, 1) as potentiel_solaire_twh,
+    ROUND(SUM(production_potentielle_eol_gwh) / 1000, 1) as potentiel_eolien_twh,
+    ROUND(SUM(production_realiste_sol_gwh) / 1000, 1) as potentiel_realiste_solaire_twh,
+    ROUND(SUM(production_realiste_eol_gwh) / 1000, 1) as potentiel_realiste_eolien_twh,
+    ROUND(SAFE_DIVIDE(SUM(puissance_solaire_installee_mw),
+        SUM(puissance_solaire_installee_mw) + SUM(puissance_installable_sol_mwc)) * 100, 1) as taux_equip_sol_pct,
+    ROUND(SAFE_DIVIDE(SUM(puissance_eolien_installee_mw),
+        SUM(puissance_eolien_installee_mw) + SUM(nb_eoliennes_installables * 2)) * 100, 1) as taux_equip_eol_pct,
+    COUNTIF(classe_disponibilite_sol = 'Disponible') as nb_communes_dispo_sol,
+    COUNTIF(classe_disponibilite_sol = 'Saturé') as nb_communes_satur_sol
+FROM {{ ref('mart_dashboard') }}
