@@ -16,6 +16,10 @@
 
 <br>
 
+<img src="assets/logo.svg" alt="SmartRenew Analytics" width="220"/>
+
+<br><br>
+
 ![SmartRenew Dashboard](assets/dashboard_overview.png)
 
 </div>
@@ -171,7 +175,6 @@ smartrenew-analytics/
 
 ```bash
 git clone https://github.com/felixog01/dbt_project-final-wagon.git
-cd smartrenew-analytics
 ```
 
 ### 2. Configurer l'accès BigQuery
