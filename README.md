@@ -380,10 +380,11 @@ Projet réalisé dans le cadre de la formation **Data Analytics du Wagon**.
 
 | | |
 |---|---|
-| **Tony Delphin** | [LinkedIn](#) · [GitHub](#) |
-| **William Pereira** | [LinkedIn](#) · [GitHub](#) |
-| **Alexis Moricci** | [LinkedIn](#) · [GitHub](#) |
-| **Félix Ortiz Gonthier** | [LinkedIn](#) · [GitHub](#) |
+| **Tony Delphin** | [LinkedIn](#) |
+| **William Pereira** | [https://www.linkedin.com/in/william-pereira-976569292/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BSyfqcW6YS%2B%2BFHnFkjQwyvg%3D%3D](#) |
+| **Alexis Moricci** | [https://www.linkedin.com/in/alexis-moricci/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BaDcjaHz%2FSZaEMMKyt7Ofkg%3D%3D](#) |
+| **Félix Ortiz Gonthier** | [www.linkedin.com/in/ortiz-gonthier-felix
+](#) |
 
 ---
 
