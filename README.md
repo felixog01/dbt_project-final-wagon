@@ -10,13 +10,12 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 ![Looker Studio](https://img.shields.io/badge/Looker_Studio-4285F4?style=for-the-badge&logo=looker&logoColor=white)
 
-*Identifier, parmi les ~35 000 communes françaises, celles au meilleur potentiel solaire et éolien — en conciliant ressource, territoire et rentabilité.*
+*Identifier, parmi les ~35 000 communes françaises, celles au meilleur potentiel solaire et éolien, en conciliant ressource, territoire et rentabilité.*
 
 [Dashboard interactif](#) · [Documentation](#-table-des-matières) · [Équipe](#-équipe)
 
 <br>
 
-<!-- 📸 Capture principale : page de titre OU carte de France colorée (page 11/16 du dashboard) -->
 ![SmartRenew Dashboard](assets/dashboard_overview.png)
 
 </div>
@@ -54,7 +53,7 @@ Le projet couvre l'ensemble de la chaîne de valeur data : **ingestion et transf
 
 La France s'est engagée à **doubler ses capacités solaires et éoliennes d'ici 2035** (PPE3). Le potentiel physique existe largement : le vrai frein est de savoir **où** implanter les projets.
 
-Or un porteur de projet — développeur, collectivité, investisseur — doit aujourd'hui croiser des données dispersées (ensoleillement, vent, contraintes réglementaires, foncier, raccordement) sans outil unifié pour comparer les territoires à l'échelle de la commune.
+Or un porteur de projet (développeur, collectivité, investisseur) doit aujourd'hui croiser des données dispersées (ensoleillement, vent, contraintes réglementaires, foncier, raccordement) sans outil unifié pour comparer les territoires à l'échelle de la commune.
 
 > **Comment identifier, parmi les ~35 000 communes françaises, celles au meilleur potentiel solaire et éolien, en conciliant ressource, territoire et rentabilité ?**
 
@@ -72,7 +71,6 @@ SmartRenew Analytics répond à ce besoin en agrégeant des données publiques p
 - 🧮 **Simulateur de projet** : commune + technologie + surface → production, investissement, ROI, CO₂ évité, nombre d'éoliennes/panneaux.
 - 📑 **Fiches techniques détaillées** par commune et par technologie (décomposition du score, ressource, territoire, finances, historique).
 
-<!-- 📸 Optionnel : capture de la page "Comprendre & Scorer" (les pétales avec pourcentages, page 8 ou 13) -->
 <div align="center">
 
 ![Méthodologie de scoring](assets/scoring_petales.png)
@@ -122,41 +120,34 @@ SmartRenew Analytics répond à ce besoin en agrégeant des données publiques p
 - **Intermediate** : construction des features (météo, énergie, territoire, production annuelle).
 - **Marts** : tables analytiques finales et vues de restitution.
 
+> **Note d'architecture :** les transformations SQL sont gérées par dbt. Le Machine Learning (clustering + projections) est réalisé en Python et écrit ses résultats dans la table `mart_ml_communes`, que dbt consomme ensuite en lecture via la vue `mart_dashboard_ml`.
+
 ---
 
 ## 📁 Structure du repository
 
 ```
 smartrenew-analytics/
-├── dbt_project/
-│   ├── models/
-│   │   ├── staging/              # nettoyage des sources
-│   │   │   ├── stg_meteo.sql
-│   │   │   ├── stg_pvgis.sql
-│   │   │   ├── stg_relief_commune.sql
-│   │   │   ├── stg_prix_terrain_dept.sql
-│   │   │   └── ...
-│   │   ├── intermediate/         # construction des features
-│   │   │   ├── int_features_meteo.sql
-│   │   │   ├── int_features_energie.sql
-│   │   │   ├── int_features_territoire.sql
-│   │   │   └── int_features_production_annuelle.sql
-│   │   └── marts/                # tables & vues finales
-│   │       ├── mart_features_communes.sql
-│   │       ├── mart_score_communes.sql
-│   │       ├── mart_dashboard.sql
-│   │       ├── mart_dashboard_national.sql
-│   │       ├── mart_dashboard_dept.sql
-│   │       ├── mart_dashboard_ml.sql
-│   │       └── mart_evolution_*.sql
-│   ├── dbt_project.yml
-│   └── profiles.yml
-├── ml/
-│   ├── clustering.py             # K-Means (profils communes)
-│   ├── regression.py             # projections 2030/2035/2040
-│   └── requirements.txt
-├── docs/                         # guides de construction du dashboard
-├── assets/                       # logo, captures d'écran
+├── models/
+│   ├── staging/              # nettoyage des sources
+│   ├── intermediate/         # construction des features
+│   └── marts/                # tables & vues finales
+│       ├── mart_features_communes.sql
+│       ├── mart_score_communes.sql
+│       ├── mart_dashboard.sql
+│       ├── mart_dashboard_national.sql
+│       ├── mart_dashboard_dept.sql
+│       ├── mart_dashboard_ml.sql
+│       └── mart_evolution_*.sql
+├── notebooks/
+│   └── smartrenew_ml.ipynb   # clustering + projections (Machine Learning)
+├── macros/
+├── seeds/
+├── snapshots/
+├── tests/
+├── analyses/
+├── assets/                   # logo, captures d'écran
+├── dbt_project.yml
 └── README.md
 ```
 
@@ -164,7 +155,7 @@ smartrenew-analytics/
 
 ## ⚙️ Installation & usage
 
-> ℹ️ **Note** : ce repository contient le code source du pipeline (modèles dbt, scripts ML).
+> ℹ️ **Note** : ce repository contient le code source du pipeline (modèles dbt, notebook ML).
 > Le projet s'appuie sur des sources de données hébergées dans un projet **BigQuery privé** ;
 > il n'est donc pas reproductible en l'état sans accès à ces données et à un environnement
 > Google Cloud configuré. Les étapes ci-dessous décrivent le fonctionnement du pipeline.
@@ -183,24 +174,15 @@ git clone https://github.com/<votre-org>/smartrenew-analytics.git
 cd smartrenew-analytics
 ```
 
-### 2. Configurer l'environnement Python
-
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows : .venv\Scripts\activate
-pip install -r ml/requirements.txt
-```
-
-### 3. Configurer l'accès BigQuery
+### 2. Configurer l'accès BigQuery
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="/chemin/vers/votre-cle.json"
 ```
 
-### 4. Lancer le pipeline dbt
+### 3. Lancer le pipeline dbt
 
 ```bash
-cd dbt_project
 dbt deps
 dbt run                          # construit staging → intermediate → marts
 dbt test                         # (optionnel) tests de qualité
@@ -208,19 +190,21 @@ dbt test                         # (optionnel) tests de qualité
 
 > ⚠️ Ordre des dépendances : `mart_score_communes` doit être construit avant `mart_dashboard`, lui-même avant les vues de service.
 
-### 5. Lancer le Machine Learning
+### 4. Lancer le Machine Learning
+
+Le Machine Learning (clustering + projections) est regroupé dans un notebook :
 
 ```bash
-cd ../ml
-python clustering.py             # génère les profils (cluster + nom)
-python regression.py             # génère les projections 2030/2035/2040
+export GOOGLE_APPLICATION_CREDENTIALS="/chemin/vers/votre-cle.json"
+jupyter notebook notebooks/smartrenew_ml.ipynb
 ```
 
-> Les résultats sont écrits dans `mart_ml_communes`. La vue `mart_dashboard_ml` doit ensuite être recréée pour joindre dashboard + ML.
+Le notebook entraîne les modèles de clustering (K-Means k=6, solaire + éolien), calcule les projections de production (2030/2035/2040), puis écrit les résultats dans la table `mart_ml_communes`. La vue `mart_dashboard_ml` joint ensuite le dashboard et les résultats ML.
 
-### 6. Visualiser
+### 5. Visualiser
 
 Le dashboard Looker Studio se branche directement sur les vues BigQuery (`mart_dashboard_ml`, `mart_dashboard_national`, `mart_dashboard_dept`, `mart_evolution_*`).
+
 ---
 
 ## 📊 Données
@@ -282,7 +266,6 @@ Chaque commune reçoit deux scores sur 100 (affichés sur 5), combinant 8 critè
 
 **Classes de potentiel** : Top potentiel · Bon potentiel · Non éligible.
 
-<!-- 📸 Capture des exemples de scoring (page 9 ou 14 : Finistère vs Alpes-Maritimes en étoiles) -->
 <div align="center">
 
 ![Exemple de scoring](assets/exemple_scoring.png)
@@ -293,7 +276,7 @@ Chaque commune reçoit deux scores sur 100 (affichés sur 5), combinant 8 critè
 
 ## 🤖 Machine Learning
 
-Deux volets développés en Python (scikit-learn) :
+Deux volets développés en Python (scikit-learn), regroupés dans `notebooks/smartrenew_ml.ipynb` :
 
 ### Clustering — K-Means (k=6 par technologie)
 Regroupe les ~35 800 communes en familles types selon leurs caractéristiques (score, ressource, foncier, contraintes). Exemples de profils :
@@ -306,7 +289,11 @@ Ce clustering alimente la recommandation de **communes alternatives** au même p
 ### Régression linéaire — projection temporelle
 Projette la production de chaque commune à horizon **2030 / 2035 / 2040** à partir de la tendance 2017-2024.
 
-> **R² moyen = 0,64** — projection tendancielle assumée : la production évolue par paliers d'installation, ce qui plafonne mécaniquement le R². Le R² par commune est fourni comme indicateur de fiabilité.
+La fiabilité se lit à deux échelles :
+- **National : R² ≈ 0.98** — la production ENR agrégée croît de façon très régulière ; c'est ce niveau qui fonde les projections nationales (106 / 135 / 163 TWh).
+- **Communal : R² moyen ≈ 0.56** — la production locale évolue par paliers d'installation, ce qui limite le R² d'un modèle temporel simple. Ces écarts se compensent à l'échelle agrégée.
+
+> Une régression multivariée a été écartée (R² négatif et partiellement tautologique). La régression temporelle est l'approche la plus robuste pour ce problème.
 
 ---
 
@@ -327,8 +314,6 @@ Toutes énergies → Renouvelables → Éolien → Solaire → Outil
 
 <div align="center">
 
-<!-- 📸 Captures AVEC une commune sélectionnée (pour éviter les agrégats nationaux) -->
-
 | Carte de potentiel | Simulateur de projet |
 |:---:|:---:|
 | ![Carte de potentiel](assets/carte_potentiel.png) | ![Simulateur](assets/simulateur.png) |
@@ -344,9 +329,9 @@ Toutes énergies → Renouvelables → Éolien → Solaire → Outil
 ## 🔑 Résultats clés
 
 - **~35 792 communes** analysées, scorées et classées (solaire + éolien).
-- Le **potentiel réaliste** (avec contraintes d'acceptabilité, réseau et foncier) **dépasse les objectifs nationaux PPE3 2035** — confirmant que le frein principal est le rythme de déploiement, pas la ressource.
+- Le **potentiel réaliste** (avec contraintes d'acceptabilité, réseau et foncier) **dépasse les objectifs nationaux PPE3 2035**, confirmant que le frein principal est le rythme de déploiement, pas la ressource.
 - **ROI réalistes** : ~10 ans pour le solaire, ~14 ans pour l'éolien (tarifs marché 2025).
-- **Distinction emprise / espacement** pour l'éolien : ~2 ha artificialisés par éolienne contre ~50 ha d'espacement — le foncier reste largement cultivable.
+- **Distinction emprise / espacement** pour l'éolien : ~2 ha artificialisés par éolienne contre ~50 ha d'espacement, le foncier restant largement cultivable.
 
 ---
 
@@ -357,7 +342,7 @@ Par souci de transparence méthodologique :
 - **Vent extrapolé** de 10 m à 100 m (hauteur de nacelle) via la loi de Hellmann (α = 0,14).
 - **Prix du foncier** disponible à la maille départementale, appliqué aux communes (données agricoles publiques).
 - **Production communale reconstruite** à partir des capacités installées × facteur de charge — léger écart avec RTE (l'éolien variant selon les conditions de vent annuelles).
-- **Projection ML** = régression tendancielle (les caractéristiques de la commune étant constantes dans le temps, ajouter des features n'améliorerait pas le R²).
+- **Projection ML** = régression tendancielle ; fiable à l'échelle nationale (R² ≈ 0.98), plus variable à l'échelle communale (R² ≈ 0.56) du fait des paliers d'installation.
 - **Potentiel réaliste** : taux de mobilisation de 5 % (solaire) et 8 % (éolien) calés sur la PPE3.
 - **Tarifs de rachat** : 88 €/MWh solaire, 80 €/MWh éolien (marché 2025).
 - **Périmètre de consommation** : données Enedis (~93 % du national RTE).
@@ -381,9 +366,9 @@ Projet réalisé dans le cadre de la formation **Data Analytics du Wagon**.
 | | |
 |---|---|
 | **Tony Delphin** | [LinkedIn](#) |
-| **William Pereira** | [LinkedIn](https://www.linkedin.com/in/william-pereira-976569292/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BSyfqcW6YS%2B%2BFHnFkjQwyvg%3D%3D) |
-| **Alexis Moricci** | [LinkedIn](https://www.linkedin.com/in/alexis-moricci/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BaDcjaHz%2FSZaEMMKyt7Ofkg%3D%3D) |
-| **Félix Ortiz Gonthier** | [LinkedIn](https://www.linkedin.com/in/ortiz-gonthier-felix/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BalA3sSy%2FRqu1WeYoKtq1AA%3D%3D) |
+| **William Pereira** | [LinkedIn](https://www.linkedin.com/in/william-pereira-976569292/) |
+| **Alexis Moricci** | [LinkedIn](https://www.linkedin.com/in/alexis-moricci/) |
+| **Félix Ortiz Gonthier** | [LinkedIn](https://www.linkedin.com/in/ortiz-gonthier-felix/) |
 
 ---
 
