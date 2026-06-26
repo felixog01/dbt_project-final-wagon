@@ -12,7 +12,7 @@
 
 *Identifier, parmi les ~35 000 communes françaises, celles au meilleur potentiel solaire et éolien, en conciliant ressource, territoire et rentabilité.*
 
-[Dashboard interactif](#) · [Documentation](#-table-des-matières) · [Équipe](#-équipe)
+[Dashboard interactif](https://datastudio.google.com/reporting/220de704-43f9-4bd8-925e-ab4c1f9c34f3) · [Documentation](#-table-des-matières) · [Équipe](#-équipe)
 
 <br>
 
@@ -170,7 +170,7 @@ smartrenew-analytics/
 ### 1. Cloner le repository
 
 ```bash
-git clone https://github.com/<votre-org>/smartrenew-analytics.git
+git clone https://github.com/felixog01/dbt_project-final-wagon.git
 cd smartrenew-analytics
 ```
 
